@@ -149,7 +149,7 @@
       let spinning = false;
       let currRotate = 0;
       const animation = async () => {
-        if (!spinning) {
+        if (!spinning && data && data.length > 1) {
           button.classList.remove("on");
           button.innerHTML = "GO";
           const rotate = Math.round(Math.random() * 360);
