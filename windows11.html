@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Windows 11</title>
+    <style type="text/css">
+      * {
+        font-family: "MalgunGothic";
+        font-size: 12px;
+        color: #fff;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+      }
+      body {
+        background-image: url("/resources/windows11/images/bg_dark.jpg");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: 50% 50%;
+      }
+      #panel {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 50px;
+        background-color: rgba(0, 0, 0, 0.5);
+        border-top: solid 1px rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+      }
+      .icon {
+        width: 40px;
+        height: 40px;
+        border: none;
+        border-radius: 5px;
+        border-top: solid 1px transparent;
+        border-bottom: solid 1px transparent;
+        background-color: transparent;
+        background-size: 80%;
+        background-position: 50% 50%;
+        background-repeat: no-repeat;
+        transition: all 0.1s;
+      }
+      .icon:hover {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        border-top-color: rgba(255, 255, 255, 0.15) !important;
+        border-bottom-color: rgba(0, 0, 0, 0.3) !important;
+      }
+      .icon:active {
+        background-size: 60% !important;
+        filter: brightness(0.8);
+      }
+      .icon#start {
+        background-image: url("/resources/windows11/images/icon_start.png");
+      }
+      .icon#explorer {
+        background-image: url("/resources/windows11/images/icon_explorer.png");
+      }
+      .icon#search {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100px;
+        height: 36px;
+        line-height: 36px;
+        background-color: rgba(255, 255, 255, 0.03);
+        border-top-color: rgba(255, 255, 255, 0.05);
+        border-bottom-color: rgba(0, 0, 0, 0.2);
+        border-radius: 18px;
+      }
+      .icon#search:before {
+        content: "🔍 검색";
+      }
+    </style>
+  </head>
+  <body>
+    <div id="panel">
+      <div class="icon" id="start"></div>
+      <div class="icon" id="search"></div>
+      <div class="icon" id="explorer"></div>
+      <div class="icon" id="widget"></div>
+    </div>
+  </body>
+</html>

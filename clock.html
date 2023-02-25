@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clock</title>
+    <style type="text/css">
+      body {
+        overflow: hidden;
+        margin: 10px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      #digit {
+        text-align: center;
+        margin: 20px auto;
+      }
+      #clock {
+        position: relative;
+        width: calc(100vw - 20px);
+        height: calc(100vw - 20px);
+        background: #f3f3f3;
+        border-radius: 50%;
+        margin: 0 auto;
+      }
+      .niddle {
+        position: absolute;
+        height: calc(((100vw - 20px) / 2) - 50px);
+        width: 4px;
+        left: calc(50% - 2px);
+        bottom: 50%;
+        transform-origin: 50% 100%;
+        border-radius: 5px;
+        border: solid 1px #fff;
+      }
+      .niddle#hours {
+        background: #000;
+        width: 10px;
+        left: calc(50% - 5px);
+        height: calc((((100vw - 20px) / 2) - 50px) * 0.7);
+      }
+      .niddle#minutes {
+        background: #333;
+      }
+      .niddle#seconds {
+        background: #f00;
+      }
+      #pin {
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        left: 50%;
+        top: 50%;
+        background: #fff;
+        border: solid 2px rgba(0, 0, 0, 0.5);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+      }
+      ul,
+      ol {
+        position: absolute;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        height: 100%;
+      }
+      ul li,
+      ol li {
+        position: absolute;
+        width: 2px;
+        left: calc(50% - 1px);
+        top: 0;
+        transform-origin: 50% calc((100vw - 20px) / 2);
+        background: rgba(0, 0, 0, 0.3);
+      }
+      ul li {
+        height: 20px;
+        background: rgba(0, 0, 0, 0.5);
+      }
+      ol li {
+        height: 10px;
+      }
+      ul li em {
+        position: absolute;
+        top: calc(100% + 5px);
+        left: 50%;
+        font-style: normal;
+        transform: translateX(-50%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="digit">00:00:00 am</div>
+    <div id="clock">
+      <div id="hours" class="niddle"></div>
+      <div id="minutes" class="niddle"></div>
+      <div id="seconds" class="niddle"></div>
+      <div id="pin"></div>
+    </div>
+    <script>
+      const clock = document.querySelector("#clock");
+      const hours = clock.querySelector("#hours");
+      const minutes = clock.querySelector("#minutes");
+      const seconds = clock.querySelector("#seconds");
+
+      function setTime() {
+        const now = new Date();
+        try {
+          const hh = now.getHours();
+          const mm = now.getMinutes();
+          const ss = now.getSeconds();
+
+          const ms = now.getMilliseconds() / 1000;
+          const s = ss + ms;
+          const m = mm * 60 + s;
+          const h = hh * 60 * 60 + s;
+
+          const hr = (360 / 12) * (h / 60 / 60);
+          const mr = (360 / 60) * (m / 60);
+          const sr = (360 / 60) * s;
+
+          hours.style.transform = `rotate(${hr}deg)`;
+          minutes.style.transform = `rotate(${mr}deg)`;
+          seconds.style.transform = `rotate(${sr}deg)`;
+
+          digit.innerText = `${hh > 12 ? hh - 12 : hh}:${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")} ${
+            hh > 12 ? "pm" : "am"
+          }`;
+        } catch (e) {
+          // do anything
+        }
+      }
+      setTime();
+      const clockInterval = setInterval(setTime, 10);
+
+      const ul = document.createElement("ul");
+      for (let i = 0; i < 12; i++) {
+        const li = document.createElement("li");
+        li.style.transform = `rotate(${i * (360 / 12)}deg)`;
+        const em = document.createElement("em");
+        em.innerText = i + (i < 1 ? 12 : 0);
+        li.appendChild(em);
+        ul.appendChild(li);
+      }
+      clock.appendChild(ul);
+
+      const ol = document.createElement("ol");
+      for (let i = 0; i < 60; i++) {
+        if (i % 5 > 0) {
+          const li = document.createElement("li");
+          li.style.transform = `rotate(${i * (360 / 60)}deg)`;
+          ol.appendChild(li);
+        }
+      }
+      clock.appendChild(ol);
+    </script>
+  </body>
+</html>

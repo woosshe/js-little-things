@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Volume</title>
+    <style type="text/css">
+      html,
+      body {
+        margin: 0;
+      }
+      #wrap {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #box {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px 30px 20px 40px;
+        background: #f3f3f3;
+        border-radius: 45px;
+      }
+      #box:not(.grab) {
+        transition: transform 0.2s;
+      }
+      #text {
+        padding: 10px;
+        height: 30px;
+        line-height: 30px;
+        width: 30px;
+        text-align: right;
+        background: #f3f3f3;
+      }
+      #slider {
+        position: relative;
+        width: 400px;
+        height: 10px;
+        background: lightgray;
+        border-radius: 5px;
+      }
+      #value {
+        position: absolute;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 0;
+        height: 100%;
+        border-radius: 5px;
+        background: tomato;
+        /* transition: all 0.5s; */
+      }
+      #handle {
+        position: absolute;
+        z-index: 2;
+        left: 0;
+        top: 0;
+        width: 20px;
+        height: 20px;
+        background: tomato;
+        border: solid 4px rgba(0, 0, 0, 0.4);
+        border-radius: 50%;
+        box-sizing: border-box;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        transform: translateX(-10px) translateY(-5px);
+        transition: border-width 0.2s;
+      }
+      #handle:hover {
+        border-width: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrap">
+      <div id="box">
+        <div id="slider">
+          <div id="value"></div>
+          <div id="handle"></div>
+        </div>
+        <div id="text">0</div>
+      </div>
+    </div>
+    <script>
+      let volume = 0;
+      let grab = false;
+      let grabPosition = 0;
+      let grabOffset = { x: 0, y: 0 };
+      let lean = 0;
+      let leanDirection = 0;
+
+      let moving = null;
+
+      const box = document.querySelector("#box");
+      const text = document.querySelector("#text");
+      const slider = document.querySelector("#slider");
+      const handle = document.querySelector("#handle");
+      const value = document.querySelector("#value");
+
+      const setVolume = (n) => {
+        n = n < 0 ? 0 : n > 100 ? 100 : n;
+        volume = n;
+        handle.style.left = `${volume}%`;
+        value.style.width = `${volume}%`;
+        text.innerHTML = Math.round(volume);
+      };
+
+      // normal
+      /*
+      box.addEventListener("click", (e) => {
+        if (e.target.getAttribute("id") === "handle") {
+          //setVolume(Math.round((e.offsetX / slider.offsetWidth) * 100));
+        } else {
+          let rate = (e.x - slider.offsetLeft) / slider.offsetWidth;
+          let vol = (rate < 0 ? 0 : rate > 1 ? 1 : rate) * 100;
+          setVolume(vol);
+        }
+      });
+
+      handle.addEventListener("mousedown", (e) => {
+        grab = true;
+        handle.style.cursor = "grabbing";
+      });
+
+      document.addEventListener("mouseenter", (e) => {
+        handle.style.cursor = "default";
+      });
+
+      document.addEventListener("mouseup", (e) => {
+        grab = false;
+        handle.style.cursor = "default";
+      });
+
+      document.addEventListener("mousemove", (e) => {
+        if (grab) {
+          let rate = (e.x - slider.offsetLeft) / slider.offsetWidth;
+          let vol = (rate < 0 ? 0 : rate > 1 ? 1 : rate) * 100;
+          setVolume(vol);
+        }
+      });
+      */
+
+      // drag
+      box.addEventListener("mousedown", (e) => {
+        grab = true;
+        grabOffset.x = e.x;
+        grabOffset.y = e.y;
+
+        box.classList.add("grab");
+
+        let rate = (e.x - slider.offsetLeft) / slider.offsetWidth;
+        let percent = (rate < 0 ? 0 : rate > 1 ? 1 : rate) * 100;
+        if (percent <= 50) {
+          grabPosition = -1;
+        } else {
+          grabPosition = 1;
+        }
+
+        moving = setInterval(() => {
+          if (leanDirection != 0) {
+            setVolume(volume + (lean * grabPosition) / 15);
+          }
+        }, 10);
+      });
+
+      document.addEventListener("mouseup", (e) => {
+        grab = false;
+        grabPosition = 0;
+        grabOffset = { x: 0, y: 0 };
+        leanDirection = 0;
+        lean = 0;
+        box.classList.remove("grab");
+        // box.style.transformOrigin = "0 0";
+        box.style.transform = `rotate(0deg)`;
+
+        clearInterval(moving);
+      });
+
+      document.addEventListener("mousemove", (e) => {
+        if (grab && grabPosition !== 0) {
+          lean = (e.y - grabOffset.y) / 10;
+          lean = lean > 45 ? 45 : lean < -45 ? -45 : lean;
+          leanDirection = lean === 0 ? 0 : lean > 0 ? 1 : -1;
+          if (grabPosition > 0) {
+            // right
+            box.style.transformOrigin = "0 50%";
+            box.style.transform = `rotate(${lean}deg)`;
+          } else {
+            // left
+            box.style.transformOrigin = "100% 50%";
+            box.style.transform = `rotate(${-lean}deg)`;
+          }
+          //console.log(leanDirection, lean);
+        }
+      });
+    </script>
+  </body>
+</html>

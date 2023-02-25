@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>kakao</title>
+    <style type="text/css">
+      html,
+      body {
+        margin: 0;
+      }
+
+      * {
+        box-sizing: border-box;
+        font-family: "MalgunGothic";
+        font-size: 12px;
+        line-height: 150%;
+      }
+
+      #wrap {
+        width: 100vw;
+        height: 100vh;
+        background: #bacee0;
+        overflow: hidden;
+      }
+
+      ul {
+        display: flex;
+        flex-direction: column;
+        list-style: none;
+        padding: 20px 0 10px 0;
+        margin: 0;
+        width: 100%;
+        height: calc(100vh - 120px);
+        overflow-y: scroll;
+      }
+
+      ul li {
+        position: relative;
+        align-self: flex-start;
+        margin: 0 10px 5px 50px;
+        background: #fff;
+        padding: 5px 10px;
+        border-radius: 5px;
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        max-width: 50%;
+        word-break: break-all;
+      }
+
+      ul li.me {
+        align-self: flex-end;
+        margin: 0 50px 5px 10px;
+        background: #ffeb33;
+      }
+
+      form {
+        position: relative;
+        margin: 0;
+        padding: 0;
+        height: 120px;
+        background: #fff;
+      }
+
+      textarea {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 70px;
+        border: none;
+        border-top: solid 1px rgba(0, 0, 0, 0.1);
+        padding: 5px 10px;
+        margin: 0;
+        resize: none;
+        outline: none;
+      }
+
+      textarea::placeholder {
+        font-size: 0;
+      }
+
+      button {
+        right: 10px;
+        bottom: 10px;
+        position: absolute;
+        background: #fee500;
+        border: none;
+        border-radius: 5px;
+        padding: 0 15px;
+        height: 30px;
+        line-height: 30px;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #fada0a;
+      }
+      button:disabled {
+        background: #f2f2f2;
+      }
+
+      em {
+        font-family: Arial;
+        font-style: normal;
+        font-size: 10px;
+      }
+
+      .arrow {
+        display: inline-block;
+        position: absolute;
+        left: -8px;
+        right: unset;
+        top: 50%;
+        transform: translateY(calc(-50% - 3px));
+        width: 8px;
+        height: 8px;
+        overflow: hidden;
+      }
+      .arrow:before {
+        content: "";
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        background: #fff;
+        transform: skewY(45deg) translateY(-50%);
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+      }
+      .arrow.me {
+        left: unset;
+        right: -8px;
+      }
+      .arrow.me:before {
+        background: #ffe94d;
+        transform: skewY(-45deg) translateY(-50%);
+      }
+
+      .time {
+        display: inline-block;
+        position: absolute;
+        left: calc(100% + 5px);
+        right: unset;
+        bottom: 0;
+        width: max-content;
+      }
+      .time.me {
+        left: unset;
+        right: calc(100% + 5px);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrap">
+      <ul>
+        <li data-dt="202302161000">ABCD</li>
+        <li data-dt="202302161000">가나다라</li>
+        <li data-dt="202302161001" class="me">ABCD</li>
+        <li data-dt="202302161002">가나다라</li>
+        <li data-dt="202302161002">ABCD</li>
+        <li data-dt="202302161002" class="me">가나다라</li>
+        <li data-dt="202302161005" class="me">ABCD</li>
+        <li data-dt="202302161007" class="me">가나다라</li>
+        <li data-dt="202302161007">ABCD</li>
+        <li data-dt="202302161008">가나다라</li>
+        <li data-dt="202302161151" class="me">ABCD</li>
+        <li data-dt="202302161204">가나다라</li>
+      </ul>
+      <form>
+        <textarea id="message" placeholder="message"></textarea>
+        <button type="submit" disabled="disabled">전송</button>
+      </form>
+    </div>
+    <script>
+      const ul = document.querySelector("ul");
+      ul.scrollTo(0, ul.scrollHeight);
+
+      const form = document.querySelector("form");
+      const textarea = form.querySelector("textarea");
+      const button = form.querySelector("button");
+
+      const fnButtonDisabled = (e) => {
+        const type = e.type;
+        const message = type === "paste" ? e.clipboardData.getData("text") : textarea.value;
+
+        if (type === "keydown" && e.keyCode === 13) {
+          e.preventDefault();
+          if (e.shiftKey) {
+            textarea.value += "\n";
+          } else {
+            fnSubmit();
+          }
+        } else {
+          if (!message) {
+            button.setAttribute("disabled", true);
+          } else {
+            button.removeAttribute("disabled");
+          }
+        }
+      };
+
+      textarea.addEventListener("keyup", fnButtonDisabled);
+      textarea.addEventListener("keydown", fnButtonDisabled);
+      textarea.addEventListener("paste", fnButtonDisabled);
+
+      function fnFormatDate(date) {
+        if (!date) date = new Date();
+        let yy = date.getFullYear();
+        let mm = date.getMonth() + 1;
+        mm = mm >= 10 ? mm : `0${mm}`;
+        let dd = date.getDate();
+        dd = dd >= 10 ? dd : `0${dd}`;
+        let hh = date.getHours();
+        hh = hh >= 10 ? hh : `0${hh}`;
+        let mi = date.getMinutes();
+        mi = mi >= 10 ? mi : `0${mi}`;
+        return `${yy}${mm}${dd}${hh}${mm}`;
+      }
+
+      function fnFormatTime(dt) {
+        try {
+          if (dt && dt.length >= 12) {
+            // const yy = parseInt(dt.substring(0, 4));
+            // const mm = parseInt(dt.substring(4, 6));
+            // const dd = parseInt(dt.substring(6, 8));
+            let hh = parseInt(dt.substring(8, 10));
+            const ap = hh < 12 ? "am" : "pm";
+            const mi = dt.substring(10, 12);
+            return `${ap} ${hh > 12 ? hh - 12 : hh}:${mi}`;
+          }
+        } catch (e) {
+          return dt;
+        }
+      }
+
+      const fnSubmit = (e) => {
+        if (e) {
+          e.preventDefault();
+          console.log(e);
+        }
+
+        const message = textarea.value;
+        if (message) {
+          const dt = fnFormatDate();
+          const li = document.createElement("li");
+          li.setAttribute("data-dt", dt);
+          li.classList.add("me");
+          li.innerText = message;
+
+          ul.appendChild(li);
+          ul.scrollTo(0, ul.scrollHeight);
+
+          textarea.value = "";
+          textarea.focus();
+
+          fnSetArrow();
+          fnSetDate();
+        }
+      };
+
+      form.addEventListener("submit", fnSubmit);
+
+      const fnSetArrow = () => {
+        const you = ul.querySelectorAll("li:not(.me):first-child, li.me+li:not(.me)");
+        you.forEach((li) => {
+          const arrow = document.createElement("em");
+          arrow.classList.add("arrow");
+          li.appendChild(arrow);
+        });
+        const me = ul.querySelectorAll("li.me:first-child, li:not(.me)+li.me");
+        me.forEach((li) => {
+          const arrow = document.createElement("em");
+          arrow.classList.add("arrow");
+          arrow.classList.add("me");
+          li.appendChild(arrow);
+        });
+      };
+      fnSetArrow();
+
+      const fnSetDate = () => {
+        let lastDt;
+        const all = ul.querySelectorAll("li");
+        all.forEach((li) => {
+          if (!li.querySelector(".time")) {
+            const dt = li.getAttribute("data-dt");
+            if (!lastDt || lastDt !== dt) {
+              const time = document.createElement("em");
+              time.classList.add("time");
+              time.innerText = fnFormatTime(dt);
+              if (li.classList.contains("me")) time.classList.add("me");
+              li.appendChild(time);
+              lastDt = dt;
+            }
+          }
+        });
+      };
+      fnSetDate();
+    </script>
+  </body>
+</html>

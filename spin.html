@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spin</title>
+    <style type="text/css">
+      #wrap {
+        display: flex;
+        justify-content: space-between;
+      }
+      #container {
+        position: relative;
+      }
+      canvas {
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: -1;
+        border-radius: 50%;
+      }
+      #triangle {
+        position: absolute;
+        z-index: 100;
+        top: -10px;
+        left: 50%;
+        width: 0;
+        height: 0;
+        transform: translateX(-50%);
+        border-bottom: 0 solid transparent;
+        border-top: 30px solid #fff;
+        border-left: 12px solid transparent;
+        border-right: 12px solid transparent;
+      }
+      button {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translateX(-50%) translateY(-50%);
+        width: 20%;
+        height: 20%;
+        border: none;
+        border-radius: 50%;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        font-size: 120%;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.1s;
+      }
+      button.on {
+        font-size: 200%;
+        width: 40%;
+        height: 40%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrap">
+      <div id="container">
+        <canvas></canvas>
+        <div id="triangle"></div>
+        <button type="button">GO</button>
+      </div>
+      <div id="data">
+        <ul></ul>
+      </div>
+    </div>
+    <!-- <span>0deg</span> -->
+    <div>
+      <form onsubmit="return add();">
+        <input type="text" placeholder="add" autofocus="true" />
+      </form>
+    </div>
+    <script>
+      const add = () => {
+        const input = document.querySelector("input");
+        setData(input.value);
+        input.value = "";
+        return false;
+      };
+
+      const setData = (value) => {
+        data.push(value);
+        draw();
+      };
+
+      const size = 500;
+      const data = [];
+
+      let currentAngle = 0; //-((Math.PI * 2) / 4);
+
+      const container = document.querySelector("#container");
+      container.style.width = `${size}px`;
+      container.style.height = `${size}px`;
+
+      const canvas = document.querySelector("canvas");
+      canvas.setAttribute("width", size);
+      canvas.setAttribute("height", size);
+
+      const ctx = canvas.getContext("2d");
+
+      const ul = document.querySelector("ul");
+
+      const draw = () => {
+        if (data.length > 0) {
+          ul.innerHTML = "";
+
+          ctx.reset();
+          ctx.translate(size / 2, size / 2);
+
+          data.map((d, i) => {
+            let angle = (1 / data.length) * 2 * Math.PI;
+            if (i === 0) {
+              currentAngle = 0 - (Math.PI * 2) / 4;
+              currentAngle -= angle / 2;
+            }
+            ctx.beginPath();
+            ctx.arc(0, 0, size, currentAngle, currentAngle + angle);
+            currentAngle += angle;
+            ctx.lineTo(0, 0);
+            ctx.fillStyle = `rgb(${Math.round(Math.random() * 100) + 155},${Math.round(Math.random() * 100) + 155},${
+              Math.round(Math.random() * 100) + 155
+            })`;
+            ctx.fill();
+
+            const li = document.createElement("li");
+            li.innerHTML = d;
+
+            ul.appendChild(li);
+          });
+          data.map((d, i) => {
+            let angle = (1 / data.length) * 2 * Math.PI;
+            if (i === 0) {
+              currentAngle = 0 - (Math.PI * 2) / 4;
+              //currentAngle -= angle / 2;
+            }
+            ctx.fillStyle = "#000";
+            ctx.font = "normal normal 20px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(`${d}`, 0, -(size / 2) * 0.75);
+            ctx.rotate((Math.PI * 2) / data.length);
+          });
+        }
+      };
+      draw();
+
+      const button = document.querySelector("button");
+
+      let spinning = false;
+      let currRotate = 0;
+      const animation = async () => {
+        if (!spinning) {
+          button.classList.remove("on");
+          button.innerHTML = "GO";
+          const rotate = Math.round(Math.random() * 360);
+          const base = Math.round(Math.random() * 4) + 2;
+          spinning = true;
+          const ani = canvas
+            .animate(
+              [{ transform: `rotate(${-currRotate}deg)` }, { transform: `rotate(${-(rotate + 360 * base)}deg)` }],
+              {
+                duration: 1000 * base,
+                fill: "forwards",
+                easing: "ease-in-out",
+              }
+            )
+            .finished.then(() => {
+              if (spinning) {
+                spinning = false;
+                currRotate = rotate;
+                let index = Math.round(rotate / (360 / data.length));
+                if (index === data.length) index = 0;
+                button.classList.add("on");
+                button.innerHTML = `${data[index]}`;
+              }
+            });
+        }
+      };
+      button.addEventListener("click", animation);
+
+      const reset = () => {
+        canvas.animate([{ transform: "rotate(0deg)" }], { duration: 500, fill: "forwards" });
+        spinning = false;
+        currRotate = 0;
+        button.classList.remove("on");
+        button.innerHTML = "GO";
+      };
+    </script>
+  </body>
+</html>
