@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Skew</title>
+    <style type="text/css">
+      html,
+      body {
+        margin: 0;
+      }
+      #wrap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100vw;
+        height: 100vh;
+        position: relative;
+        background: #222;
+      }
+      .box {
+        background: #000;
+        width: 90vw;
+        height: 90vh;
+        position: relative;
+        perspective: 800px;
+        overflow: hidden;
+      }
+      .item {
+        position: absolute;
+        background: #aaa;
+        box-shadow: 0 0 50px rgba(0, 0, 0, 1);
+        z-index: 999;
+        transition: all 0.3s;
+      }
+      .item img {
+        vertical-align: bottom;
+      }
+      .item .shadow {
+        position: absolute;
+        top: 100%;
+        background: #fff;
+        width: 100%;
+        height: 20%;
+        z-index: -1;
+        background: linear-gradient(rgba(255, 255, 255, 0.05), transparent);
+      }
+      .buttons {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .buttons button {
+        font-size: 64px;
+        width: 100px;
+        height: 100px;
+        border: none;
+        background: transparent;
+        color: #fff;
+      }
+      .count {
+        font-size: 16px;
+        color: #fff;
+        position: absolute;
+        right: 10px;
+        top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrap">
+      <div class="box">
+        <div class="buttons">
+          <button type="button" id="btnPrev">&lt;</button>
+          <button type="button" id="btnNext">&gt;</button>
+        </div>
+        <div class="count"></div>
+      </div>
+    </div>
+    <script>
+      let current = 0;
+
+      const length = 50;
+      const boxSize = 400;
+      const zIndex = 99;
+
+      const box = document.querySelector(".box");
+      const count = box.querySelector(".count");
+
+      for (let i = 0; i < length; i++) {
+        const item = document.createElement("div");
+        item.classList.add("item");
+        item.style.left = `calc(50% - ${boxSize / 2}px)`;
+        item.style.top = `calc(50% - ${boxSize / 2}px)`;
+        item.style.zIndex = zIndex;
+        item.style.transform = "unset";
+
+        const img = document.createElement("img");
+        img.setAttribute("src", `https://picsum.photos/${boxSize}/${boxSize}?${Math.random()}`);
+
+        const shadow = document.createElement("div");
+        shadow.classList.add("shadow");
+
+        item.appendChild(img);
+        item.appendChild(shadow);
+        box.appendChild(item);
+      }
+
+      const boxItems = box.querySelectorAll(".item");
+      const positioning = () => {
+        for (let i = 0; i < boxItems.length; i++) {
+          const item = boxItems[i];
+          const n = Math.abs(current - i);
+
+          let brightness = 1 - n / 10 - 0.3;
+          brightness = brightness < 0 ? 0 : brightness;
+
+          let scale = 80 - n * 5;
+
+          if (i < current) {
+            item.style.left = `calc(50% - ${boxSize}px + ${boxSize / 4}px - ${n * (boxSize / 7)}px)`;
+            item.style.zIndex = `${zIndex - n - 1}`;
+            item.style.transform = `scale(${scale}%) rotateY(${50}deg)`;
+            item.style.filter = `brightness(${brightness})`;
+          } else if (i > current) {
+            item.style.left = `calc(50% - ${boxSize / 4}px + ${n * (boxSize / 7)}px)`;
+            item.style.zIndex = `${zIndex - n - 1}`;
+            item.style.transform = `scale(${scale}%) rotateY(-${50}deg)`;
+            item.style.filter = `brightness(${brightness})`;
+          } else {
+            item.style.left = `calc(50% - ${boxSize / 2}px)`;
+            item.style.zIndex = zIndex;
+            item.style.transform = "unset";
+            item.style.filter = "unset";
+          }
+        }
+
+        count.innerHTML = `${current + 1} / ${boxItems.length}`;
+      };
+
+      positioning();
+
+      const handler = (n) => {
+        if (n) {
+          if (current + n < 0) {
+            current = 0;
+          } else if (current + n > boxItems.length - 1) {
+            current = boxItems.length - 1;
+          } else {
+            current += n;
+          }
+          positioning();
+        }
+      };
+
+      document.querySelector("#btnPrev").addEventListener("click", () => {
+        handler(-1);
+      });
+
+      document.querySelector("#btnNext").addEventListener("click", () => {
+        handler(1);
+      });
+
+      document.addEventListener("keyup", (e) => {
+        const { keyCode, shiftKey } = e;
+        let n = 0;
+        if (keyCode == 37) {
+          n = shiftKey ? -5 : -1;
+        } else if (keyCode == 39) {
+          n = shiftKey ? 5 : 1;
+        }
+        handler(n);
+      });
+    </script>
+  </body>
+</html>
