@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calendar</title>
+    <style type="text/css">
+      ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+      }
+      ul li {
+        background: #f3f3f3;
+        min-width: 40px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        position: relative;
+      }
+      li.lastMonth,
+      li.nextMonth {
+        color: rgba(0, 0, 0, 0.4);
+      }
+      ul li:hover::before {
+        position: absolute;
+        left: calc(50% - 20px);
+        top: calc(50% - 20px);
+        content: "";
+        background: rgba(0, 0, 0, 0.1);
+        font-weight: bold;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="now"></div>
+    <div id="test"></div>
+    <ul id="calendar"></ul>
+    <script type="text/javascript">
+      const addDate = (d, n, type) => {
+        try {
+          const date = new Date(d);
+          if (type && type.toUpperCase() === "Y") {
+            return new Date(date.setFullYear(date.getFullYear() + n));
+          } else if (type && type.toUpperCase() === "M") {
+            return new Date(date.setMonth(date.getMonth() + n));
+          } else {
+            return new Date(date.setDate(date.getDate() + n));
+          }
+        } catch (e) {
+          return null;
+        }
+      };
+
+      const getLastDate = (d) => {
+        try {
+          let date = new Date(d).setDate(1);
+          date = addDate(date, 1, "M");
+          date = addDate(date, -1, "D");
+          return date;
+        } catch (e) {
+          return null;
+        }
+      };
+
+      const now = new Date();
+      const first = new Date(new Date(now).setDate(1));
+      const firstDay = first.getDay();
+      const last = getLastDate(first);
+
+      let date = new Date();
+      let cnt = 0;
+      const ul = document.querySelector("ul#calendar");
+      for (let i = 0 - firstDay; i < last.getDate(); i++) {
+        date = addDate(first, i);
+        const li = document.createElement("li");
+        if (i < 0) {
+          li.classList.add("lastMonth");
+        }
+        if (date.getDate() === now.getDate()) {
+          li.classList.add("today");
+        }
+        li.innerHTML = `${date.getDate()}`;
+        ul.appendChild(li);
+        cnt++;
+      }
+
+      if (cnt % 7) {
+        for (let i = 1; i <= 7 - (cnt % 7); i++) {
+          date = addDate(date, 1);
+          const li = document.createElement("li");
+          li.classList.add("nextMonth");
+          li.innerHTML = `${date.getDate()}`;
+          ul.appendChild(li);
+        }
+      }
+    </script>
+  </body>
+</html>
