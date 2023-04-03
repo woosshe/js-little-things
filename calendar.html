@@ -4,101 +4,147 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Calendar</title>
-    <style type="text/css">
-      ul {
-        margin: 0;
-        padding: 0;
-        list-style: none;
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-      }
-      ul li {
-        background: #f3f3f3;
-        min-width: 40px;
-        height: 40px;
-        line-height: 40px;
-        text-align: center;
-        position: relative;
-      }
-      li.lastMonth,
-      li.nextMonth {
-        color: rgba(0, 0, 0, 0.4);
-      }
-      ul li:hover::before {
-        position: absolute;
-        left: calc(50% - 20px);
-        top: calc(50% - 20px);
-        content: "";
-        background: rgba(0, 0, 0, 0.1);
-        font-weight: bold;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-      }
-    </style>
   </head>
+  <style type="text/css">
+    ul {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+    }
+    li {
+      width: 30px;
+      height: 30px;
+      line-height: 30px;
+      text-align: center;
+      justify-self: center;
+    }
+    li:nth-of-type(7n) {
+      color: royalblue;
+    }
+    li:nth-of-type(7n + 1) {
+      color: tomato;
+    }
+    li.today {
+      background-color: black;
+      color: #fff;
+      font-weight: bold;
+      border-radius: 50%;
+    }
+    li.lastMonth,
+    li.nextMonth {
+      opacity: 0.3 !important;
+    }
+    .header,
+    .footer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin: 20px 0;
+    }
+  </style>
   <body>
-    <div id="now"></div>
-    <div id="test"></div>
+    <div class="header">
+      <button type="button" onclick="lastYear();">&lt;&lt;</button>
+      <button type="button" onclick="lastMonth();">&lt;</button>
+      <div id="month"></div>
+      <button type="button" onclick="nextMonth();">&gt;</button>
+      <button type="button" onclick="nextYear();">&gt;&gt;</button>
+    </div>
+
     <ul id="calendar"></ul>
+
+    <div class="footer">
+      <button type="button" onclick="setToday();">today</button>
+    </div>
+
     <script type="text/javascript">
-      const addDate = (d, n, type) => {
-        try {
-          const date = new Date(d);
-          if (type && type.toUpperCase() === "Y") {
-            return new Date(date.setFullYear(date.getFullYear() + n));
-          } else if (type && type.toUpperCase() === "M") {
-            return new Date(date.setMonth(date.getMonth() + n));
-          } else {
-            return new Date(date.setDate(date.getDate() + n));
+      const days = ["S", "M", "T", "W", "T", "F", "S"];
+      let calendar = new Date();
+
+      const minYear = 1900;
+      const maxYear = 2190;
+
+      const format = (date, ym) => {
+        if (date && date.getTime) {
+          let str = `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}`;
+          if (!ym) {
+            str += `.${String(date.getDate()).padStart(2, "0")}`;
           }
-        } catch (e) {
-          return null;
+          return str;
+        }
+        return;
+      };
+
+      const classDay = (date) => {};
+
+      const drawCalendar = () => {
+        const month = document.querySelector("#month");
+        month.innerHTML = `${format(calendar, true)}`;
+
+        const firstDate = new Date(calendar.getFullYear(), calendar.getMonth(), 1);
+        const lastDate = new Date(calendar.getFullYear(), calendar.getMonth() + 1, 0);
+
+        const ul = document.querySelector("#calendar");
+        ul.innerHTML = "";
+
+        for (let i = 0; i < days.length; i++) {
+          ul.innerHTML += `<li>${days[i]}</li>`;
+        }
+
+        if (firstDate.getDay() > 0) {
+          for (let i = 1; i <= firstDate.getDay(); i++) {
+            const date = new Date(new Date(firstDate).setDate(1 - (7 - i)));
+            ul.innerHTML += `<li class="lastMonth">${date.getDate()}</li>`;
+          }
+        }
+
+        for (let i = firstDate.getDate(); i <= lastDate.getDate(); i++) {
+          const date = new Date(new Date(calendar).setDate(i));
+          ul.innerHTML += `<li class="${format(date) === format(new Date()) ? "today" : ""}">${i}</li>`;
+        }
+
+        for (let i = 1; i < 7 - lastDate.getDay(); i++) {
+          ul.innerHTML += `<li class="nextMonth">${i}</li>`;
         }
       };
 
-      const getLastDate = (d) => {
-        try {
-          let date = new Date(d).setDate(1);
-          date = addDate(date, 1, "M");
-          date = addDate(date, -1, "D");
-          return date;
-        } catch (e) {
-          return null;
+      const lastMonth = () => {
+        if (calendar.getFullYear() > minYear || calendar.getMonth() > 0) {
+          calendar.setDate(0);
+          drawCalendar();
         }
       };
 
-      const now = new Date();
-      const first = new Date(new Date(now).setDate(1));
-      const firstDay = first.getDay();
-      const last = getLastDate(first);
+      const nextMonth = () => {
+        if (calendar.getFullYear() < maxYear || calendar.getMonth() < 11) {
+          calendar.setDate(32);
+          drawCalendar();
+        }
+      };
 
-      let date = new Date();
-      let cnt = 0;
-      const ul = document.querySelector("ul#calendar");
-      for (let i = 0 - firstDay; i < last.getDate(); i++) {
-        date = addDate(first, i);
-        const li = document.createElement("li");
-        if (i < 0) {
-          li.classList.add("lastMonth");
+      const lastYear = () => {
+        if (calendar.getFullYear() > minYear) {
+          calendar.setYear(calendar.getFullYear() - 1);
+          drawCalendar();
         }
-        if (date.getDate() === now.getDate()) {
-          li.classList.add("today");
-        }
-        li.innerHTML = `${date.getDate()}`;
-        ul.appendChild(li);
-        cnt++;
-      }
+      };
 
-      if (cnt % 7) {
-        for (let i = 1; i <= 7 - (cnt % 7); i++) {
-          date = addDate(date, 1);
-          const li = document.createElement("li");
-          li.classList.add("nextMonth");
-          li.innerHTML = `${date.getDate()}`;
-          ul.appendChild(li);
+      const nextYear = () => {
+        if (calendar.getFullYear() < maxYear) {
+          calendar.setYear(calendar.getFullYear() + 1);
+          drawCalendar();
         }
-      }
+      };
+
+      const setToday = () => {
+        calendar = new Date();
+        drawCalendar();
+      };
+
+      setToday();
     </script>
   </body>
 </html>
