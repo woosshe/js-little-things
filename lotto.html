@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style type="text/css">
+      ul {
+        margin: 0;
+        padding: 10px;
+        list-style: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+      }
+      ul li {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        font-weight: bold;
+        color: #fff;
+        text-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+        font-size: 16px;
+        border-radius: 50%;
+        position: relative;
+      }
+      ul li.yellow {
+        background-color: #fbc400;
+      }
+      ul li.blue {
+        background-color: #69c8f2;
+      }
+      ul li.red {
+        background-color: #ff7272;
+      }
+      ul li.gray {
+        background-color: #aaaaaa;
+      }
+      ul li.green {
+        background-color: #b0d840;
+      }
+      ul li.add {
+        margin-left: 20px;
+      }
+      ul li.add::before {
+        content: "+";
+        position: absolute;
+        left: -40px;
+        width: 40px;
+        text-shadow: none;
+        color: #000;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="lotto"></div>
+    <script type="text/javascript">
+      const drawNumbers = (arr) => {
+        if (arr && arr.length > 0) {
+          const ul = document.createElement("ul");
+          for (let i = 0; i < arr.length; i++) {
+            const li = document.createElement("li");
+            li.innerText = arr[i];
+
+            if (arr[i] <= 10) {
+              li.classList.add("yellow");
+            } else if (arr[i] <= 20) {
+              li.classList.add("blue");
+            } else if (arr[i] <= 30) {
+              li.classList.add("red");
+            } else if (arr[i] <= 40) {
+              li.classList.add("gray");
+            } else {
+              li.classList.add("green");
+            }
+
+            if (i + 1 === arr.length) {
+              li.classList.add("add");
+            }
+            ul.appendChild(li);
+          }
+
+          const lotto = document.querySelector("#lotto");
+          lotto.appendChild(ul);
+        }
+      };
+
+      const getAllNumbers = () => {
+        const allNumbers = [];
+        for (let i = 0; i < 45; i++) {
+          allNumbers.push(i + 1);
+        }
+        return allNumbers;
+      };
+      const getNumbers1 = () => {
+        const allNumbers = getAllNumbers();
+
+        // 배열 랜덤 정렬 후 앞 6개 가져오는 방법
+        allNumbers.sort(() => Math.random() - 0.5);
+        const numbers = allNumbers.slice(0, 6);
+
+        // 정렬
+        numbers.sort((a, b) => (a < b ? -1 : 1));
+
+        // 정렬 후 보너스번호 추가
+        numbers.push(allNumbers.slice(6, 7));
+
+        drawNumbers(numbers);
+      };
+      getNumbers1();
+
+      const getNumbers2 = () => {
+        const allNumbers = getAllNumbers();
+
+        // 배열에서 랜덤으로 숫자를 하나씩 가져오는 방법
+        const numbers = [];
+        for (let i = 0; i < 6; i++) {
+          numbers.push(...allNumbers.splice(Math.round(Math.random() * allNumbers.length - 1), 1));
+        }
+
+        // 정렬
+        numbers.sort((a, b) => (a < b ? -1 : 1));
+
+        // 정렬 후 보너스번호 추가
+        numbers.push(...allNumbers.splice(Math.round(Math.random() * allNumbers.length - 1), 1));
+
+        drawNumbers(numbers);
+      };
+      getNumbers2();
+    </script>
+  </body>
+</html>
