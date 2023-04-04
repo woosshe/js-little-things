@@ -42,10 +42,10 @@
       ul li.green {
         background-color: #b0d840;
       }
-      ul li.add {
+      ul li.bonus {
         margin-left: 20px;
       }
-      ul li.add::before {
+      ul li.bonus::before {
         content: "+";
         position: absolute;
         left: -40px;
@@ -65,6 +65,7 @@
             const li = document.createElement("li");
             li.innerText = arr[i];
 
+            // add color
             if (arr[i] <= 10) {
               li.classList.add("yellow");
             } else if (arr[i] <= 20) {
@@ -77,8 +78,9 @@
               li.classList.add("green");
             }
 
+            // add bonus
             if (i + 1 === arr.length) {
-              li.classList.add("add");
+              li.classList.add("bonus");
             }
             ul.appendChild(li);
           }
