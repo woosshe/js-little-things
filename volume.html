@@ -181,7 +181,7 @@
 
       document.addEventListener("mousemove", (e) => {
         if (grab && grabPosition !== 0) {
-          lean = (e.y - grabOffset.y) / 10;
+          lean = (e.y - grabOffset.y) / 7;
           lean = lean > 45 ? 45 : lean < -45 ? -45 : lean;
           leanDirection = lean === 0 ? 0 : lean > 0 ? 1 : -1;
           if (grabPosition > 0) {
