@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cards</title>
+    <style type="text/css">
+      #wrap {
+        position: fixed;
+        top: 50%;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+      #wrap #container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+      }
+      .card {
+        position: absolute;
+        width: 200px;
+        height: 300px;
+        box-sizing: border-box;
+        border-radius: 10px;
+        background-color: #fff;
+        top: 0;
+        transition: all 0.2s;
+        background-position: center center;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+      }
+      .card.active {
+        z-index: 9999;
+        box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrap">
+      <div id="container"></div>
+    </div>
+    <script type="text/javascript">
+      let curr = 0;
+      const count = 12;
+      const wrap = document.querySelector("#wrap");
+      const container = wrap.querySelector("#container");
+      const containerHeight = container.scrollHeight;
+
+      const createCard = () => {
+        for (let i = 0; i < count; i++) {
+          const card = document.createElement("div");
+          card.classList.add("card");
+          if (i == 0) card.classList.add("active");
+          card.style.backgroundImage = `url(https://picsum.photos/300/300?${Math.random()})`;
+          container.appendChild(card);
+        }
+      };
+      createCard();
+
+      const drawCard = () => {
+        const cards = document.querySelectorAll("#wrap #container .card");
+        cards.forEach((card, i) => {
+          card.style.transform = `rotate(${0 - i * (360 / count)}deg) ${
+            i == 0 ? " scale(1.1)" : ""
+          }`;
+          card.style.transformOrigin = `50% calc(100% + ${containerHeight / 2}px)`;
+        });
+      };
+      drawCard();
+
+      let x;
+      document.addEventListener("mousedown", (e) => (x = e.x));
+      document.addEventListener("mouseup", (e) => {
+        curr += x > e.x ? 1 : -1;
+        const cards = document.querySelectorAll("#wrap #container .card");
+        let center;
+        cards.forEach((card, i) => {
+          const deg = 0 - (curr + i) * (360 / count);
+          let transform = `rotate(${deg}deg)`;
+          if (deg % 360 == 0) {
+            card.classList.add("active");
+            transform += ` scale(1.1)`;
+          } else {
+            card.classList.remove("active");
+          }
+          card.style.transform = transform;
+        });
+      });
+    </script>
+  </body>
+</html>

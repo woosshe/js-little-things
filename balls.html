@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ball</title>
+    <style type="text/css">
+      html,
+      body {
+        margin: 0;
+        overflow: hidden;
+        background: #000;
+      }
+      .ball {
+        border-radius: 50%;
+        position: absolute;
+        transition: background-color 1s;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="text/javascript">
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
+
+      const balls = 3;
+      const colors = ["#e74c3c", "#f1c40f", "#3498db", "#2ecc71"];
+
+      const createBall = () => {
+        const ball = document.createElement("div");
+        ball.classList.add("ball");
+
+        const size = Math.random() * (windowWidth / 1) + 500;
+        const left = Math.random() * windowWidth - size / 2;
+        const top = Math.random() * windowHeight - size / 2;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+
+        ball.style.width = `${size}px`;
+        ball.style.height = `${size}px`;
+
+        ball.style.left = `${left}px`;
+        ball.style.top = `${top}px`;
+
+        ball.style.backgroundColor = `${color}`;
+        //ball.style.background = `radial-gradient(${color}, ${color}00)`;
+        ball.style.filter = `blur(${size / 4}px)`;
+
+        document.body.append(ball);
+        return ball;
+      };
+
+      const animateBall = (ball, left, top, color) => {
+        const size = Math.random() * (windowWidth / 1) + 500;
+        const leftTo = Math.random() * windowWidth - size / 2;
+        const topTo = Math.random() * windowWidth - size / 2;
+        const colorTo = colors[Math.floor(Math.random() * colors.length)];
+        ball
+          .animate(
+            [
+              {
+                left: `${left ? left : Math.random() * windowWidth}px`,
+                top: `${top ? top : Math.random() * windowHeight}px`,
+                backgroundColor: `${
+                  color ? color : colors[Math.floor(Math.random() * colors.length)]
+                }`,
+              },
+              {
+                left: `${leftTo}px`,
+                top: `${topTo}px`,
+                backgroundColor: `${colorTo}`,
+              },
+            ],
+            { duration: Math.random() * 2000 + 1000, iterations: 1 }
+          )
+          .finished.then((e) => {
+            animateBall(ball, leftTo, topTo, colorTo);
+          });
+      };
+
+      for (let i = 0; i < balls; i++) {
+        const ball = createBall();
+        animateBall(ball);
+      }
+    </script>
+  </body>
+</html>
