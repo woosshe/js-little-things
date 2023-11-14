@@ -29,11 +29,12 @@
         top: 0;
         transition: all 0.2s;
         background-position: center center;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+        background-size: cover;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       }
       .card.active {
         z-index: 9999;
-        box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
       }
     </style>
   </head>
@@ -53,7 +54,7 @@
           const card = document.createElement("div");
           card.classList.add("card");
           if (i == 0) card.classList.add("active");
-          card.style.backgroundImage = `url(https://picsum.photos/300/300?${Math.random()})`;
+          card.style.backgroundImage = `url(https://picsum.photos/400/600?${Math.random()})`;
           container.appendChild(card);
         }
       };
@@ -63,7 +64,7 @@
         const cards = document.querySelectorAll("#wrap #container .card");
         cards.forEach((card, i) => {
           card.style.transform = `rotate(${0 - i * (360 / count)}deg) ${
-            i == 0 ? " scale(1.1)" : ""
+            i == 0 ? " scale(1.2)" : ""
           }`;
           card.style.transformOrigin = `50% calc(100% + ${containerHeight / 2}px)`;
         });
@@ -81,7 +82,7 @@
           let transform = `rotate(${deg}deg)`;
           if (deg % 360 == 0) {
             card.classList.add("active");
-            transform += ` scale(1.1)`;
+            transform += ` scale(1.2)`;
           } else {
             card.classList.remove("active");
           }
