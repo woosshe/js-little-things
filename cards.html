@@ -27,10 +27,10 @@
         border-radius: 10px;
         background-color: #fff;
         top: 0;
-        transition: all 0.2s;
+        transition: all 0.4s ease-out;
         background-position: center center;
         background-size: cover;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
       }
       .card.active {
         z-index: 9999;
@@ -44,7 +44,7 @@
     </div>
     <script type="text/javascript">
       let curr = 0;
-      const count = 12;
+      const count = 36;
       const wrap = document.querySelector("#wrap");
       const container = wrap.querySelector("#container");
       const containerHeight = container.scrollHeight;
@@ -64,7 +64,7 @@
         const cards = document.querySelectorAll("#wrap #container .card");
         cards.forEach((card, i) => {
           card.style.transform = `rotate(${0 - i * (360 / count)}deg) ${
-            i == 0 ? " scale(1.2)" : ""
+            i == 0 ? " scale(1.1)" : ""
           }`;
           card.style.transformOrigin = `50% calc(100% + ${containerHeight / 2}px)`;
         });
@@ -82,7 +82,7 @@
           let transform = `rotate(${deg}deg)`;
           if (deg % 360 == 0) {
             card.classList.add("active");
-            transform += ` scale(1.2)`;
+            transform += ` scale(1.1)`;
           } else {
             card.classList.remove("active");
           }
