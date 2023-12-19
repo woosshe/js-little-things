@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Card</title>
+    <style type="text/css">
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+      #wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 60px;
+        padding: 40px;
+        width: 100%;
+        min-height: 100%;
+        box-sizing: border-box;
+      }
+      .card {
+        width: 250px;
+        aspect-ratio: 734/1024;
+        perspective: 500px;
+      }
+      .card .image {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: 50% 50%;
+        /* border: solid 2px #fff; */
+        box-sizing: border-box;
+        border-radius: 10px;
+        box-shadow: 10px 30px 50px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+      }
+      .card .image .overlay {
+        position: absolute;
+        z-index: 2;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        opacity: 0;
+        mix-blend-mode: color-dodge;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrap"></div>
+    <script type="text/javascript">
+      const getDeg = (coord, size) => {
+        return Number(((coord / size - 0.5) * 20).toFixed(2));
+      };
+      const setGradient = (o, x, y) => {
+        const n = ((x / o.offsetWidth) * 50 + (y / o.offsetHeight) * 50) * 2.7;
+        o.style.backgroundImage = `url('./resources/images/pattern04.png'),
+          linear-gradient(-${40 + n / 7}deg,
+          rgba(255, 122, 117, 0)    calc(100% / 7 * 1   - ${n / 1.5}px),
+          rgba(255, 237, 97, 0.5)   calc(100% / 7 * 2   - ${n / 1.5}px),
+          rgba(168, 255, 97, 0.1)   calc(100% / 7 * 3   - ${n / 1.5}px),
+          rgba(133, 255, 247, 0)    calc(100% / 7 * 3.5 - ${n / 1.5}px),
+          rgba(162, 218, 255, 1)    calc(100% / 7 * 4.7 - ${n / 1.5}px),
+          rgba(216, 117, 255, 0.25) calc(100% / 7 * 6   - ${n / 1.5}px),
+          rgba(255, 122, 117, 0)    calc(100% / 7 * 7   - ${n / 1.5}px)
+        )`;
+      };
+      const wrap = document.querySelector("#wrap");
+      for (let i = 1; i <= 3; i++) {
+        const card = document.createElement("div");
+        card.classList.add("card");
+
+        const image = document.createElement("div");
+        image.classList.add("image");
+        image.style.backgroundImage = `url(resources/images/card${String(i).padStart(2, "0")}.webp)`;
+
+        const overlay = document.createElement("div");
+        overlay.classList.add("overlay");
+
+        image.append(overlay);
+        card.append(image);
+        wrap.append(card);
+
+        card.addEventListener("mousemove", (e) => {
+          const image = card.querySelector(".image");
+          const { offsetX, offsetY } = e,
+            { offsetWidth, offsetHeight } = image;
+          image.style.transition = ``;
+          image.style.transform = `rotateY(${getDeg(offsetX, offsetWidth) * -1}deg) rotateX(${getDeg(offsetY, offsetHeight)}deg)`;
+          const overlay = image.querySelector(".overlay");
+          overlay.style.transition = ``;
+          overlay.style.opacity = `${(offsetX / offsetWidth) * 0.8 + (offsetY / offsetHeight) * 0.8}`;
+          //overlay.style.backgroundSize = `${(offsetX / offsetWidth) * 150 + 100}% ${(offsetY / offsetHeight) * 400 + 100}%`;
+          //overlay.style.backgroundPosition = `${(offsetX / offsetWidth) * 100}% ${(offsetY / offsetHeight) * 100}%}`;
+          setGradient(overlay, offsetX, offsetY);
+        });
+        card.addEventListener("mouseout", (e) => {
+          const image = card.querySelector(".image");
+          image.style.transition = `all 0.1s ease-out`;
+          image.style.transform = ``;
+          const overlay = image.querySelector(".overlay");
+          overlay.style.transition = `all 0.1s ease-out`;
+          overlay.style.opacity = `0`;
+        });
+      }
+    </script>
+  </body>
+</html>

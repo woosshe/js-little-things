@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style type="text/css">
+      #wrap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        zoom: 0.5;
+      }
+      .flip {
+        position: relative;
+        height: 340px;
+        width: 200px;
+        background: linear-gradient(0, #333, #000, #333);
+        border-radius: 10px;
+        perspective: 800px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      }
+      .flip > hr {
+        position: absolute;
+        top: calc(50% - 1px);
+        z-index: 9999;
+        width: 100%;
+        height: 1px;
+        padding: 0;
+        margin: 0;
+        border: none;
+        background-color: #fff6;
+      }
+      .flip > div {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 50%;
+        transition: all 1s;
+        color: #fff;
+        text-align: center;
+        font-family: Impact;
+        font-size: 240px;
+        background: #333;
+        overflow: hidden;
+        border-radius: 10px;
+      }
+      .flip > div.t {
+        background: linear-gradient(#333, #000);
+        top: 0;
+        transform-origin: bottom;
+      }
+      .flip > div.b {
+        background: linear-gradient(#000, #333);
+        bottom: 0;
+        transform-origin: top;
+        transform: rotateX(90deg);
+      }
+      .flip > div > span {
+        position: relative;
+        display: block;
+        height: 150px;
+        line-height: 150px;
+      }
+      .flip > div.t > span {
+        top: calc(170px - 75px);
+      }
+      .flip > div.b > span {
+        top: calc(0px - 75px);
+      }
+      .flip > span {
+        display: block;
+        width: 200px;
+        height: 340px;
+        line-height: 340px;
+        color: #fff;
+        text-align: center;
+        font-family: Impact;
+        font-size: 240px;
+      }
+      .z9 {
+        z-index: 9;
+      }
+      .z8 {
+        z-index: 8;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrap">
+      <div id="f1" class="flip">
+        <hr />
+        <span>0</span>
+      </div>
+      <div id="f2" class="flip">
+        <hr />
+        <span>0</span>
+      </div>
+      <div id="f3" class="flip">
+        <hr />
+        <span>0</span>
+      </div>
+      <div id="f4" class="flip">
+        <hr />
+        <span>0</span>
+      </div>
+      <div id="f5" class="flip">
+        <hr />
+        <span>0</span>
+      </div>
+      <div id="f6" class="flip">
+        <hr />
+        <span>0</span>
+      </div>
+    </div>
+    <script type="text/javascript">
+      let h1 = 0;
+      const f1 = document.querySelector("#f1");
+      const f2 = document.querySelector("#f2");
+      const f3 = document.querySelector("#f3");
+      const f4 = document.querySelector("#f4");
+      const f5 = document.querySelector("#f5");
+      const f6 = document.querySelector("#f6");
+
+      const duration = 400;
+
+      const tic = (obj, n, max) => {
+        let h1 = n;
+        let h2 = n - 1;
+        if (h1 > max) h1 = 0;
+        if (h2 < 1) h2 = 0;
+
+        const t1 = document.createElement("div");
+        t1.classList.add("t");
+        t1.innerHTML = `<span>${h2}</span>`;
+
+        const t2 = t1.cloneNode();
+        t2.classList.add("t");
+        t2.innerHTML = `<span>${h1}</span>`;
+
+        t1.classList.add("z9");
+        t2.classList.add("z8");
+        obj.appendChild(t1);
+        obj.appendChild(t2);
+
+        const b1 = document.createElement("div");
+        b1.classList.add("b");
+        b1.innerHTML = `<span>${h1}</span>`;
+        obj.appendChild(b1);
+        obj.appendChild(b1);
+
+        t1.animate(
+          [
+            {
+              transform: `rotateX(0deg)`,
+              filter: `brightness(1)`,
+            },
+            {
+              transform: `rotateX(-90deg)`,
+              filter: `brightness(0)`,
+            },
+          ],
+          { duration: duration / 2, easing: "ease-in" }
+        ).finished.then(() => {
+          t1.remove();
+          b1.animate(
+            [
+              {
+                transform: `rotateX(90deg)`,
+                filter: `brightness(0)`,
+              },
+              {
+                transform: `rotateX(0deg)`,
+                filter: `brightness(1)`,
+              },
+            ],
+            { duration: duration / 2, easing: "ease-out" }
+          ).finished.then(() => {
+            obj.querySelector("span").innerText = `${h1}`;
+            t2.remove();
+            b1.remove();
+          });
+        });
+
+        if (h1 == 0) {
+          let s2 = Math.floor(new Date().getSeconds() / 10);
+          tic(f5, s2, 5);
+        }
+      };
+
+      let str =
+        String(new Date().getHours()).padStart(2, "0") +
+        String(new Date().getMinutes()).padStart(2, "0") +
+        String(new Date().getSeconds()).padStart(2, "0");
+
+      tic(f1, str.split("")[0], 5);
+      tic(f2, str.split("")[1], 9);
+      tic(f3, str.split("")[2], 5);
+      tic(f4, str.split("")[3], 9);
+      tic(f5, str.split("")[4], 5);
+      tic(f6, str.split("")[5], 9);
+
+      setInterval(() => {
+        tic(f6, new Date().getSeconds() % 10, 9);
+      }, 1000);
+    </script>
+  </body>
+</html>
