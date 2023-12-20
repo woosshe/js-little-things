@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Confetti</title>
+    <style type="text/css">
+      html,
+      body {
+        background-color: #000;
+        background-image: radial-gradient(#f066, #000f);
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+      }
+      .particle {
+        position: absolute;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="text/javascript">
+      const colors = ["red", "blue", "chartreuse", "yellow", "white", "magenta", "aqua", "orange"];
+      const turn = (o, a, b, c, d) => {
+        const [aa, bb, cc, dd] = [
+          Math.round(Math.random() * 4) - 2,
+          Math.round(Math.random() * 4) - 2,
+          Math.round(Math.random() * 4) - 2,
+          Math.round(Math.random() * 360),
+        ];
+        o.animate(
+          [
+            {
+              transform: `rotate3d(${a},${b},${c},${d}deg)`,
+            },
+            {
+              transform: `rotate3d(${aa},${bb},${cc},${dd}deg)`,
+            },
+          ],
+          {
+            duration: 200,
+          }
+        ).finished.then(() => {
+          turn(o, aa, bb, cc, dd);
+        });
+      };
+      const fall = (o) => {
+        const zoom = Math.random() * 3;
+        o.style.opacity = zoom + 0.3;
+
+        const color = o.querySelector(".color");
+        color.style.width = `${Math.random() * 10 * zoom}px`;
+        color.style.height = `${Math.random() * 10 * zoom}px`;
+        color.style.backgroundColor = `${colors[Math.floor(Math.random() * colors.length)]}`;
+
+        const l = Math.floor(Math.random() * 200) - 50;
+        o.animate(
+          [
+            { top: `-50px`, left: `${l}%` },
+            { top: `100%`, left: `calc(${l}% - ${(zoom - 1) * 200}px)` },
+          ],
+          {
+            duration: (3 - zoom) * 5000,
+          }
+        ).finished.then(() => {
+          fall(o);
+        });
+      };
+      for (let i = 0; i < 300; i++) {
+        const particle = document.createElement("div");
+        particle.classList.add("particle");
+        const color = document.createElement("div");
+        color.classList.add("color");
+        particle.append(color);
+        document.body.append(particle);
+
+        particle.style.left = `${Math.floor(Math.random() * 100)}%`;
+
+        turn(color);
+        fall(particle);
+      }
+    </script>
+  </body>
+</html>
