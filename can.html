@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Can</title>
+    <style type="text/css">
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #000;
+        background-image: radial-gradient(#f006, #000);
+      }
+      #wrap {
+        position: fixed;
+        left: 50%;
+        /* top: calc(50% - 75px); */
+        top: 50%;
+        perspective: 800px;
+        transform: translateX(-50%) translateY(-50%);
+      }
+      #drag-area {
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        /* bottom: 200px; */
+        bottom: 0;
+        z-index: 2;
+      }
+      #can {
+        width: 100%;
+        height: 100%;
+        transform-style: preserve-3d;
+      }
+      .g {
+        position: absolute;
+        /* width: 27px; */
+        height: 400px;
+        transform-style: preserve-3d;
+      }
+      .face {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-image: url("./resources/images/can01.png");
+        background-repeat: no-repeat;
+        box-sizing: border-box;
+        border-top: solid 5px #fed;
+        border-bottom: solid 5px #fed;
+      }
+      .face:nth-child(1) {
+        transform: translateZ(100px);
+      }
+      .face:nth-child(2) {
+        transform: translateZ(-100px) rotateY(180deg);
+      }
+      .cap {
+        position: absolute;
+        width: 202px;
+        height: 202px;
+        border-radius: 50%;
+        background-repeat: no-repeat;
+        background-size: cover;
+      }
+      .cap.top {
+        transform: translateX(-50%) translateY(-300px) rotateX(90deg) rotateZ(-45deg);
+        background-image: url("./resources/images/canTop.png");
+      }
+      .cap.bottom {
+        transform: translateX(-50%) translateY(100px) rotateX(90deg) rotateZ(-45deg);
+        background-image: url("./resources/images/canBottom.png");
+      }
+    </style>
+  </head>
+  <body>
+    <div id="drag-area"></div>
+    <div id="wrap">
+      <div id="can"></div>
+    </div>
+    <script type="text/javascript">
+      const can = document.querySelector("#can");
+
+      const g = document.createElement("div");
+      g.classList.add("g");
+
+      const face = document.createElement("div");
+      face.classList.add("face");
+
+      const imageWidth = 648;
+      const faces = 24;
+      for (let i = 0; i < faces / 2; i++) {
+        const e = g.cloneNode();
+        const faceWidth = imageWidth / faces;
+        e.style.width = `${Math.ceil(faceWidth)}px`;
+        const f1 = face.cloneNode();
+        const f2 = face.cloneNode();
+        f1.style.backgroundPosition = `${-(i * faceWidth)}px 0`;
+        f2.style.backgroundPosition = `${-((i + faces / 2) * faceWidth)}px 0`;
+        e.append(f1);
+        e.append(f2);
+
+        e.style.transform = ` translate(-50%, -50%) rotateY(${i * (360 / faces)}deg)`;
+        can.append(e);
+      }
+
+      const cap = document.createElement("div");
+      cap.classList.add("cap");
+      const capTop = cap.cloneNode();
+      capTop.classList.add("top");
+      const capBottom = cap.cloneNode();
+      capBottom.classList.add("bottom");
+      can.append(capTop);
+      can.append(capBottom);
+
+      const dragArea = document.querySelector("#drag-area");
+      let clickX = 0;
+      let clickY = 0;
+
+      let moveX = 0;
+      let moveY = 0;
+
+      let lastX = -25;
+      let lastY = 25;
+
+      let isClick = false;
+      dragArea.addEventListener("mousedown", (e) => {
+        isClick = true;
+        clickX = e.screenX;
+        clickY = e.screenY;
+
+        window.addEventListener(
+          "mouseup",
+          (e) => {
+            if (isClick) {
+              lastX = moveX;
+              lastY = moveY;
+              isClick = false;
+            }
+          },
+          { once: true }
+        );
+      });
+
+      window.addEventListener("mousemove", (e) => {
+        dragArea.style.cursor = isClick ? "move" : "";
+        if (isClick) {
+          const nowX = e.screenX;
+          const nowY = e.screenY;
+
+          moveX = lastX + clickY - nowY;
+          moveY = lastY - clickX + nowX;
+
+          can.style.transform = ` rotateX(${moveX / 3}deg) rotateY(${moveY / 3}deg) `;
+        }
+      });
+    </script>
+  </body>
+</html>
