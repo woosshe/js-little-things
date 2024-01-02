@@ -81,6 +81,9 @@
       <div id="can"></div>
     </div>
     <script type="text/javascript">
+      const imageWidth = 648;
+      const faces = 24;
+
       const can = document.querySelector("#can");
 
       const g = document.createElement("div");
@@ -89,8 +92,6 @@
       const face = document.createElement("div");
       face.classList.add("face");
 
-      const imageWidth = 648;
-      const faces = 24;
       for (let i = 0; i < faces / 2; i++) {
         const e = g.cloneNode();
         const faceWidth = imageWidth / faces;
@@ -144,17 +145,38 @@
         );
       });
 
+      let canTransform = {
+        rotateX: null,
+        rotateY: null,
+        scale: 1,
+      };
+      const setCanTransform = () => {
+        let transform = "";
+        if (canTransform.rotateX) transform += ` rotateX(${canTransform.rotateX}deg) `;
+        if (canTransform.rotateY) transform += ` rotateY(${canTransform.rotateY}deg) `;
+        if (canTransform.scale) transform += ` scale(${canTransform.scale}) `;
+        can.style.transform = transform;
+      };
+
       window.addEventListener("mousemove", (e) => {
         dragArea.style.cursor = isClick ? "move" : "";
         if (isClick) {
-          const nowX = e.screenX;
-          const nowY = e.screenY;
+          const { screenX, screenY } = e;
 
-          moveX = lastX + clickY - nowY;
-          moveY = lastY - clickX + nowX;
+          moveX = lastX + clickY - screenY;
+          moveY = lastY - clickX + screenX;
 
-          can.style.transform = ` rotateX(${moveX / 3}deg) rotateY(${moveY / 3}deg) `;
+          canTransform.rotateX = moveX / 3;
+          canTransform.rotateY = moveY / 3;
+          setCanTransform();
         }
+      });
+
+      let wrapZoom = 1;
+      window.addEventListener("wheel", (e) => {
+        const { deltaY } = e;
+        wrapZoom += deltaY > 0 ? (wrapZoom < 3 ? 0.05 : 0) : wrapZoom > 0.5 ? -0.05 : 0;
+        wrap.style.zoom = wrapZoom;
       });
     </script>
   </body>
