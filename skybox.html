@@ -68,10 +68,14 @@
       }
       #sliders {
         position: fixed;
-        z-index: 1;
+        z-index: 3;
+        width: 300px;
+        border-radius: 30px;
         left: 50%;
         bottom: 20px;
         transform: translateX(-50%);
+        background-color: rgba(255, 255, 255, 0.5);
+        padding: 20px 40px;
         display: none;
       }
       #sliders label {
@@ -99,6 +103,11 @@
     </div>
     <div id="sliders">
       <div><label for="scale">Scale</label><input id="scale" type="range" min="1" max="30" value="10" /><span>1</span></div>
+      <div>
+        <label for="perspective">Perspective</label><input id="perspective" type="range" min="100" max="800" data-suffix="px" value="10" /><span
+          >1</span
+        >
+      </div>
       <div>
         <label for="rotateX">Rotate X</label><input id="rotateX" type="range" min="-360" max="360" value="0" data-suffix="deg" /><span>0</span>
       </div>
