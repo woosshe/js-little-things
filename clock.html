@@ -1,160 +1,200 @@
 <!DOCTYPE html>
 <html lang="ko">
   <head>
-    <meta charset="UTF-8" />
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Clock</title>
     <style type="text/css">
+      html,
       body {
-        overflow: hidden;
-        margin: 10px;
-      }
-      * {
-        box-sizing: border-box;
-      }
-      #digit {
-        text-align: center;
-        margin: 20px auto;
-      }
-      #clock {
-        position: relative;
-        width: calc(100vw - 20px);
-        height: calc(100vw - 20px);
-        background: #f3f3f3;
-        border-radius: 50%;
-        margin: 0 auto;
-      }
-      .niddle {
-        position: absolute;
-        height: calc(((100vw - 20px) / 2) - 50px);
-        width: 4px;
-        left: calc(50% - 2px);
-        bottom: 50%;
-        transform-origin: 50% 100%;
-        border-radius: 5px;
-        border: solid 1px #fff;
-      }
-      .niddle#hours {
-        background: #000;
-        width: 10px;
-        left: calc(50% - 5px);
-        height: calc((((100vw - 20px) / 2) - 50px) * 0.7);
-      }
-      .niddle#minutes {
-        background: #333;
-      }
-      .niddle#seconds {
-        background: #f00;
-      }
-      #pin {
-        position: absolute;
-        width: 14px;
-        height: 14px;
-        left: 50%;
-        top: 50%;
-        background: #fff;
-        border: solid 2px rgba(0, 0, 0, 0.5);
-        border-radius: 50%;
-        transform: translate(-50%, -50%);
-      }
-      ul,
-      ol {
-        position: absolute;
-        list-style: none;
-        padding: 0;
-        margin: 0;
         width: 100%;
         height: 100%;
+        overflow: hidden;
       }
-      ul li,
-      ol li {
-        position: absolute;
-        width: 2px;
-        left: calc(50% - 1px);
-        top: 0;
-        transform-origin: 50% calc((100vw - 20px) / 2);
-        background: rgba(0, 0, 0, 0.3);
-      }
-      ul li {
-        height: 20px;
-        background: rgba(0, 0, 0, 0.5);
-      }
-      ol li {
-        height: 10px;
-      }
-      ul li em {
-        position: absolute;
-        top: calc(100% + 5px);
+      #wrap {
+        position: fixed;
+        z-index: 1;
         left: 50%;
-        font-style: normal;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .board {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        /* background-color: #eee; */
+        transform-origin: 50% 50%;
+        overflow: hidden;
+      }
+      .board .index {
+        position: absolute;
+        z-index: 2;
+        left: 50%;
+        width: 4px;
+        border-radius: 2px;
+      }
+      .board .number {
+        position: absolute;
+        z-index: 3;
+        left: 50%;
+      }
+      .board .number span {
+        display: block;
+        font-family: "Arial Rounded MT";
+        font-size: 200%;
+        letter-spacing: -0.15em;
+      }
+      .board .niddle {
+        position: absolute;
+        z-index: 4;
+        left: 50%;
+        width: 2px;
+        transform-origin: 50% 100%;
+        /* transition: all 1s linear; */
         transform: translateX(-50%);
+        width: 10px;
+        border-radius: 5px;
+        background-color: black;
+      }
+      .board .niddle.seconds {
+        z-index: 6;
+        width: 2px;
+        border-radius: 1px;
+        background-color: tomato;
+      }
+      .board .center1 {
+        position: absolute;
+        z-index: 5;
+        width: 22px;
+        height: 22px;
+        left: 50%;
+        top: 50%;
+        box-sizing: border-box;
+        background: #fff;
+        border-radius: 50%;
+        border: solid 6px #000;
+        transform: translate(-50%, -50%);
+      }
+      .board .center2 {
+        position: absolute;
+        z-index: 6;
+        width: 12px;
+        height: 12px;
+        left: 50%;
+        top: 50%;
+        box-sizing: border-box;
+        background: #fff;
+        border-radius: 50%;
+        border: solid 3px tomato;
+        transform: translate(-50%, -50%);
+      }
+      .board .date {
+        position: absolute;
+        left: 50%;
+        top: 30%;
+        font-family: "Segoe UI", "MalgunGothic";
+        font-size: 100%;
+        font-weight: 100;
+        transform: translate(-50%, -50%);
       }
     </style>
   </head>
   <body>
-    <div id="digit">00:00:00 am</div>
-    <div id="clock">
-      <div id="hours" class="niddle"></div>
-      <div id="minutes" class="niddle"></div>
-      <div id="seconds" class="niddle"></div>
-      <div id="pin"></div>
-    </div>
-    <script>
-      const clock = document.querySelector("#clock");
-      const hours = clock.querySelector("#hours");
-      const minutes = clock.querySelector("#minutes");
-      const seconds = clock.querySelector("#seconds");
+    <div id="wrap"><div class="board"></div></div>
+    <script type="text/javascript">
+      const size = 400;
 
-      function setTime() {
-        const now = new Date();
-        try {
-          const hh = now.getHours();
-          const mm = now.getMinutes();
-          const ss = now.getSeconds();
+      const wrap = document.querySelector("#wrap");
+      const board = wrap.querySelector(".board");
 
-          const ms = now.getMilliseconds() / 1000;
-          const s = ss + ms;
-          const m = mm * 60 + s;
-          const h = hh * 60 * 60 + s;
+      wrap.style.width = `${size}px`;
+      wrap.style.height = `${size}px`;
 
-          const hr = (360 / 12) * (h / 60 / 60);
-          const mr = (360 / 60) * (m / 60);
-          const sr = (360 / 60) * s;
+      for (let i = 1; i <= 12; i++) {
+        const index = document.createElement("div");
+        index.classList.add(`index`, `hour`, `h${String(i).padStart(2, "0")}`);
+        index.style.transformOrigin = `50% ${size / 2}px`;
+        index.style.transform = `translateX(-50%) rotate(${i * (360 / 12)}deg)`;
+        index.style.height = `${size / 30}px`;
+        index.style.backgroundColor = `rgba(0, 0, 0, 1)`;
+        board.append(index);
 
-          hours.style.transform = `rotate(${hr}deg)`;
-          minutes.style.transform = `rotate(${mr}deg)`;
-          seconds.style.transform = `rotate(${sr}deg)`;
+        const number = document.createElement("div");
+        number.classList.add(`number`);
+        number.style.transformOrigin = `50% ${size / 2}px`;
+        number.style.transform = `translateX(-50%) rotate(${i * (360 / 12)}deg)`;
+        number.style.paddingTop = `calc(${size / 25}px)`;
 
-          digit.innerText = `${hh > 12 ? hh - 12 : hh}:${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")} ${
-            hh > 12 ? "pm" : "am"
-          }`;
-        } catch (e) {
-          // do anything
-        }
+        const span = document.createElement("span");
+        span.style.transform = `rotate(-${i * (360 / 12)}deg)`;
+        span.innerText = i;
+
+        number.append(span);
+        board.append(number);
       }
-      setTime();
-      const clockInterval = setInterval(setTime, 10);
 
-      const ul = document.createElement("ul");
-      for (let i = 0; i < 12; i++) {
-        const li = document.createElement("li");
-        li.style.transform = `rotate(${i * (360 / 12)}deg)`;
-        const em = document.createElement("em");
-        em.innerText = i + (i < 1 ? 12 : 0);
-        li.appendChild(em);
-        ul.appendChild(li);
-      }
-      clock.appendChild(ul);
-
-      const ol = document.createElement("ol");
-      for (let i = 0; i < 60; i++) {
+      for (let i = 1; i <= 60; i++) {
         if (i % 5 > 0) {
-          const li = document.createElement("li");
-          li.style.transform = `rotate(${i * (360 / 60)}deg)`;
-          ol.appendChild(li);
+          const index = document.createElement("div");
+          index.classList.add(`index`, `minutes`, `m${String(i).padStart(2, "0")}`);
+          index.style.transformOrigin = `50% ${size / 2}px`;
+          index.style.transform = `translateX(-50%) rotate(${i * (360 / 60)}deg)`;
+          index.style.height = `${size / 40}px`;
+          index.style.backgroundColor = `rgba(0, 0, 0, 0.2)`;
+          board.append(index);
         }
       }
-      clock.appendChild(ol);
+
+      const niddle = document.createElement("div");
+      niddle.classList.add("niddle");
+
+      const niddle_h = niddle.cloneNode();
+      niddle_h.classList.add("hour");
+      niddle_h.style.marginTop = `${size / 3.5}px`;
+      niddle_h.style.height = `calc(${size / 2}px - ${size / 3.5}px)`;
+      board.append(niddle_h);
+
+      const niddle_m = niddle.cloneNode();
+      niddle_m.classList.add("minutes");
+      niddle_m.style.marginTop = `${size / 6}px`;
+      niddle_m.style.height = `calc(${size / 2}px - ${size / 6}px)`;
+      board.append(niddle_m);
+
+      const niddle_s = niddle.cloneNode();
+      niddle_s.classList.add("seconds");
+      niddle_s.style.height = `${size / 2}px`;
+      board.append(niddle_s);
+
+      const center = document.createElement("div");
+
+      const c1 = center.cloneNode();
+      c1.classList.add("center1");
+      board.append(c1);
+
+      const c2 = center.cloneNode();
+      c2.classList.add("center2");
+      board.append(c2);
+
+      const date = document.createElement("div");
+      date.classList.add("date");
+      board.append(date);
+
+      const setDate = () => {
+        const now = new Date();
+        date.innerText = `${now.getMonth() + 1} / ${now.getDate()} (${["일", "월", "화", "수", "목", "금", "토"][now.getDay()]})`;
+      };
+      setInterval(setDate, 1000);
+
+      const setTime = () => {
+        const transform = `translateX(-50%)`;
+        const now = new Date();
+        niddle_h.style.transform = `${transform} rotate(${(now.getHours() * 60 + now.getMinutes()) / 2}deg)`;
+        niddle_m.style.transform = `${transform} rotate(${(now.getMinutes() * 60 + now.getSeconds()) / 10}deg)`;
+        niddle_s.style.transform = `${transform} rotate(${(now.getSeconds() + now.getMilliseconds() / 1000) * 6}deg)`;
+      };
+      setTime();
+
+      setInterval(setTime, 1000 / 30);
     </script>
   </body>
 </html>
